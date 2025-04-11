@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html lang="ar">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>احاجي سودانية</title>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+
+
+        body {
+
+            font-family: 'Tajawal', sans-serif;
+
+            background: url('https://i.imgur.com/RLq3gWr.jpeg') no-repeat center center/cover;
+
+            text-align: center;
+
+            color: white;
+
+            padding: 20px;
+
+        }
+
+        .quiz-container {
+
+            background: rgba(0, 0, 0, 0.8);
+
+            width: 90%;
+
+            max-width: 500px;
+
+            margin: auto;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            box-shadow: 0px 0px 15px gold;
+
+            transition: transform 0.5s ease-in-out;
+
+        }
+
+        h1 {
+
+            font-size: 24px;
+
+            color: gold;
+
+        }
+
+        .question {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            margin-bottom: 10px;
+
+            color: lightblue;
+
+        }
+
+        #answer-input {
+
+            width: 85%;
+
+            padding: 12px;
+
+            font-size: 18px;
+
+            border-radius: 5px;
+
+            border: 2px solid gold;
+
+            text-align: center;
+
+            background: black;
+
+            color: white;
+
+            direction: rtl;
+
+        }
+
+        button {
+
+            background: gold;
+
+            color: black;
+
+            font-size: 18px;
+
+            padding: 10px 20px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            margin-top: 10px;
+
+        }
+
+        button:hover {
+
+            background: orange;
+
+        }
+
+        .keyboard {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+            margin-top: 10px;
+
+        }
+
+        .key {
+
+            background: gray;
+
+            color: white;
+
+            font-size: 18px;
+
+            padding: 10px;
+
+            margin: 5px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            width: 40px;
+
+            text-align: center;
+
+        }
+
+        .key:hover {
+
+            background: darkgray;
+
+        }
+
+        #feedback {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+            margin-top: 10px;
+
+        }
+
+        #correct-answer {
+
+            font-size: 18px;
+
+            color: cyan;
+
+            display: none;
+
+        }
+
+        #result {
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+
+            display: none;
+
+        }
+           
+        /* تحسينات للهواتف */
+
+        @media (max-width: 600px) {
+
+            h1 { font-size: 20px; }
+
+            .question { font-size: 18px; }
+
+            input[type="text"] { font-size: 16px; }
+
+            button { font-size: 16px; padding: 8px 16px; }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <div class="quiz-container">
+
+        <h1>احاجي سودانية</h1>
+
+        <p class="question"></p>
+
+        <input type="text" id="answer-input" placeholder="اكتب إجابتك هنا..." readonly>
+
+        
+
+        <!-- Arabic Keyboard -->
+
+        <div class="keyboard"></div>
+
+
+
+        <button onclick="submitAnswer()">إرسال</button>
+
+        <p id="feedback"></p>
+
+        <p id="correct-answer"></p>
+
+        <p id="result"></p>
+
+         <button onclick="toggleMusic()">🎵 تشغيل / إيقاف الموسيقى</button>
+
+    </div>
+
+         
+    <!-- الأصوات -->
+
+    <audio id="correct-sound" src="https://www.myinstants.com/media/sounds/correct-answer.mp3"></audio>
+
+    <audio id="wrong-sound" src="https://www.myinstants.com/media/sounds/wrong-answer.mp3"></audio>
+
+    <audio id="next-sound" src="https://www.myinstants.com/media/sounds/button-click.mp3"></audio>
+
+    <audio id="background-music" src="https://www.bensound.com/bensound-music/bensound-funkyelement.mp3" loop></audio>
+
+
+
+
+    <script>
+ 
+const questions = [
+
+    { question: "دخل القش ما قال كش", answer: "الظل" },
+
+    { question: "عمي قصير وبصير", answer: "القدوم" },
+
+    { question: "عمي طويل ما بلحق الكعكول", answer: "الدرب" },
+
+    { question: "سبعة صقور من زمن الرسول لا ولدا زادا. ولا كبراً شاباً", answer: "أيام الأسبوع" },
+
+    { question: "حبوبتى فى دكانه وتأكل فى مصرانه", answer: "اللمبة" },
+
+    { question: "كان شالوه ما بنشال وكان خلوه سكن الدار", answer: "الرماد" },
+
+    { question: "شدرة فوق القيف لا برم ولا عليف", answer: "السن" },
+
+    { question: "فيها فت سنينه وفيها فت عوينه وبسم الله علينا", answer: "الإبرة" },
+
+    { question: "مطمورة أبو زيد ملانه بيض", answer: "النجم" },
+
+    { question: "شاتى بيوض عندها سخلة وعتوت", answer: "المرحاكة" },
+
+    { question: "ملكين فى ككر إن غاب واحد الثانى حضر", answer: "الشمس والقمر" },
+
+    { question: "مطارق الهوج والشرق اتخبطن", answer: "الرموش" },
+
+    { question: "أحمر حيمور ، تمر الديمور، تمر الـمُـلَّاك، الما بِنْلاك", answer: "الشطة" },
+
+    { question: "عمى تيا تيا مصارينو مية", answer: "العنقريب" },
+
+    { question: "عمى البكتاف بشق الليل ما بخاف", answer: "اللمبة" },
+
+    { question: "اربعة واقفين و اربعة راقدين و الباقي مصارين", answer: "العنقريب" },
+
+    { question: "ليها تنبلة وليها قنبور تعالوا شوفوها عليكم الرسول", answer: "البصلة" },
+
+    { question: "عيشي شريتو، قمت الصباح ما لقيتو", answer: "النجوم" },
+
+    { question: "عنزي هبَّك هبَّك، أم ضرعاً مشبَّك، الوادي واديها، منو البقدر يحميها", answer: "المطرة" },
+
+    { question: "حمرا حمنقرة تصر العين وتلوي العنقرة", answer: "الدومة" },
+
+    { question: "حبوبتي من جنها، شايله جدي في سنها", answer: "الشعبة" },
+
+    { question: "عتودي ود الحرام ضبحتو الليلة وباكر قام", answer: "كعكول الصمغ" },
+
+    { question: "لامشت في الواطه ولا اكلت عيش تقا وهي عروس وامها فتاه", answer: "الدمية" },
+
+    { question: "بقر ابوي رقل رقل عقالهن واحد", answer: "النجوم" },
+
+    { question: "فتحتها فتحة كتاب .. لقيت فيها الأكل والشراب", answer: "البطيخة" },
+
+    { question: "سيفي سليتو... النوبة والعرب ما يرجِّعوه في بيتو", answer: "اللبن" },
+
+    { question: "سرنا وسرسرنا.. ود الجن ما يقص أثرنا", answer: "المركب" },
+
+    { question: "ديك شرارة.. فوق دبَّة حدارة .. قلوب الناس أبنَّها.. والكلاب نبحنَّها", answer: "البندقية" },
+
+    { question: "أخدر خدير... مربَّط بالجنازير ... في بطنو حرير", answer: "البطيخ" },
+
+    { question: "كان شالو رطَنْ... وكان خلوا بَطَنْ", answer: "القيد" },
+
+    { question: "بنات الفَزَع... مربِّطات رويساتِن بلا وجع", answer: "القطاطي" },
+
+    { question: "مشيها تَتَرَبْ.. وجريها تَتَرَبْ.. يا نوبة يا عرب .. شوفوا الشغُل البلا ضَنَب", answer: "الضفدعة" },
+
+    { question: "الهَرْبَعَة.. أم كرعيناً أربعة .. إن قامت مشَتْ .. الدنيا انكفَتْ", answer: "الفروة" },
+
+    { question: "فى البيت وريحتو ما بتنشم", answer: "الملح" },
+
+    { question: "حبوبتى من هولا وجولا حتى الملوك عقلولها", answer: "المريسة" },
+
+    { question: "قدر الفيل ... وصرتها صرة منديل", answer: "الناموسية" },
+
+    { question: "خمسة بُلْبُلات.. شايلات بُلبُلة.. شاقَّات الطِّليح .. ماشَّات دنقلا", answer: "أصابع اليد، اللقمة، الحلق، البطن" },
+
+    { question: "الضب قال في رقبة أبوك كككرب", answer: "الحنجرة" },
+
+    { question: "فيها فد سنينه وفيها فد عوينه وبسسسم الله علينا", answer: "الإبرة" },
+
+    { question: "قطع البحر بلا عضم ضهر", answer: "الصوت" },
+
+    { question: "عمي المقدم يجري ويتحزم", answer: "المترار" },
+
+    { question: "دخل القش ما قال كش", answer: "الضل" },
+
+    { question: "حبوبتى تية تية قمصانا  100", answer: "البصلة" },
+
+    { question: "عتودي ود الحرام ضبحتو الليلة وباكر قام", answer: "الكعكول" },
+
+    { question: "ملكين في ككر .. كان ده غاب  التاني حضر", answer: "الشمس والقمر" },
+
+    { question: "جدادتى الرقيطة تجيب الخبر من تحت", answer: "الجواب" },
+
+    { question: "عابدة .... الفي الجروف لابدة", answer: "المركب" },
+
+    { question: "لوح صابون في الواطه مدفون", answer: "الفجل" },
+
+    { question: "حجر حجرجر .. حجارة؟  لأ، رقبة طويلة.. نعامة؟  لأ, تبيض وتفقس..جدادة؟  لأ, تعضي وترفس.. حمارة؟  لأ", answer: "أبوالقدح" },
+
+    { question: "فى البيت وريحتو ما بتنشم", answer: "الملح" },
+
+    { question: "حبوبتى من شدتا ولضتا شايلة جدى فى رقبتا", answer: "الشعبة" },
+
+    { question: "قدر الفيل ... وصرتها صرة منديل", answer: "الناموسية" },
+
+    { question: "من فوق راكوبة .. ومن تحت راكوبة ... وسطهن صبي يقلب في الهوبة", answer: "اللهاة واللسان" },
+
+    { question: "أزرق كتة اب كرعيناً ستة", answer: "ابو الجعران" },
+
+    { question: "أحمر حيمور متل التيمور - جيت أخمو نقدتني أمو", answer: "الجمر" },
+
+    { question: "عمي قصير وقفاطينو ميه", answer: "عيش الريف" }
+
+        ];
+
+
+
+        let usedQuestions = [];
+
+        let score = 0;
+
+        let totalQuestions = 56;
+
+
+        
+        function enableAudio() {
+
+            if (!audioEnabled) {
+
+                document.getElementById("background-music").play();
+
+                audioEnabled = true;
+
+            }
+
+         }
+            
+          function getRandomQuestion() {
+
+            if (usedQuestions.length >= totalQuestions) {
+
+                showResult();
+
+                return;
+
+            }
+
+
+
+            let availableQuestions = questions.filter(q => !usedQuestions.includes(q));
+
+            let randomIndex = Math.floor(Math.random() * availableQuestions.length);
+
+            let selectedQuestion = availableQuestions[randomIndex];
+
+
+
+            usedQuestions.push(selectedQuestion);
+
+            document.querySelector(".question").textContent = selectedQuestion.question;
+
+            document.getElementById("answer-input").value = "";
+
+            document.getElementById("feedback").textContent = "";
+
+            document.getElementById("correct-answer").style.display = "none";
+
+       
+
+            document.getElementById("next-sound").play();
+ 
+       }
+
+
+
+        function submitAnswer() {
+
+            let userAnswer = document.getElementById("answer-input").value.trim();
+
+            let currentQuestion = usedQuestions[usedQuestions.length - 1];
+
+
+
+            if (userAnswer === "") {
+
+                alert("يرجى إدخال إجابة!");
+
+                return;
+
+            }
+
+
+
+            if (userAnswer === currentQuestion.answer) {
+
+                document.getElementById("feedback").textContent = "✅ شاطر!";
+
+                document.getElementById("feedback").style.color = "lime";
+
+                score++;
+
+             document.getElementById("correct-sound").play();
+
+            } else {
+
+                document.getElementById("feedback").textContent = "❌ كدابًا كدب!";
+
+                document.getElementById("feedback").style.color = "red";
+
+                document.getElementById("correct-answer").textContent = `الإجابة الصحيحة: ${currentQuestion.answer}`;
+
+                document.getElementById("correct-answer").style.display = "block";
+
+                document.getElementById("wrong-sound").play();    
+        }
+
+
+
+            setTimeout(getRandomQuestion, 2000);
+
+        }
+
+
+
+        function showResult() {
+
+            document.querySelector(".question").style.display = "none";
+
+            document.getElementById("answer-input").style.display = "none";
+
+            document.querySelector("button").style.display = "none";
+
+            document.getElementById("feedback").style.display = "none";
+
+            document.getElementById("correct-answer").style.display = "none";
+
+            document.getElementById("result").textContent = `🎉 نتيجتك: ${score} / ${totalQuestions} \n شكراً! 🎉`;
+
+            document.getElementById("result").style.display = "block";
+
+        }
+
+
+           function toggleMusic() {
+
+            let music = document.getElementById("background-music");
+
+            musicPlaying ? music.pause() : music.play();
+
+            musicPlaying = !musicPlaying;
+
+        }
+
+        // Arabic Keyboard Functionality
+
+        function createKeyboard() {
+
+            const arabicLetters = "ضصثقفغعهخحجدشسيبلاتنمكطئءؤرلاىةوزظذدزظ".split('');
+
+            const keyboardContainer = document.querySelector(".keyboard");
+
+            arabicLetters.forEach(letter => {
+
+                let keyButton = document.createElement("div");
+
+                keyButton.classList.add("key");
+
+                keyButton.textContent = letter;
+
+                keyButton.onclick = () => insertLetter(letter);
+
+                keyboardContainer.appendChild(keyButton);
+
+            });
+
+
+
+            // Add space and delete buttons
+
+            let spaceKey = document.createElement("div");
+
+            spaceKey.classList.add("key");
+
+            spaceKey.style.width = "80px";
+
+            spaceKey.textContent = "مسافة";
+
+            spaceKey.onclick = () => insertLetter(" ");
+
+            keyboardContainer.appendChild(spaceKey);
+
+
+
+            let deleteKey = document.createElement("div");
+
+            deleteKey.classList.add("key");
+
+            deleteKey.textContent = "⌫";
+
+            deleteKey.onclick = deleteLetter;
+
+            keyboardContainer.appendChild(deleteKey);
+
+        }
+
+
+
+        function insertLetter(letter) {
+
+            document.getElementById("answer-input").value += letter;
+
+        }
+
+
+
+        function deleteLetter() {
+
+            let inputField = document.getElementById("answer-input");
+
+            inputField.value = inputField.value.slice(0, -1);
+
+        }
+
+
+
+        window.onload = function() {
+
+            getRandomQuestion();
+
+            createKeyboard();
+
+        };
+
+    </script>
+
+
+
+</body>
+
+</html>
+
